@@ -17,13 +17,18 @@ typedef enum labError (*lpfnSiglentSSG3021X_IDN)(
     char** lpResultOut,
     unsigned long int* lpResultLenOut
 );
-
+typedef enum labError (*lpfnSiglentSSG3021X_RFOutputEnable)(
+    struct siglentSSG3021x* lpDevice,
+    bool bEnable
+);
 
 
 
 struct siglentSSG3021x_Vtbl {
     lpfnSiglentSSG3021X_Disconnect              disconnect;
     lpfnSiglentSSG3021X_IDN                     idn;
+
+    lpfnSiglentSSG3021X_RFOutputEnable          rfOutEnable;
 };
 struct siglentSSG3021x {
     struct siglentSSG3021x_Vtbl*                vtbl;

@@ -14,7 +14,8 @@ LIBS=bin/librawsockscpitools$(SLIBSUFFIX) \
 
 TOOLS=bin/rigol5000_idn$(EXESUFFIX) \
 	bin/rigol5000_querywaveform$(EXESUFFIX) \
-	bin/siglentssg3021x_idn$(EXESUFFIX)
+	bin/siglentssg3021x_idn$(EXESUFFIX) \
+	bin/siglentssg3021x_rfonoff$(EXESUFFIX)
 
 OBJS=tmp/rigolmso5000.o \
 	tmp/scpicommand.o \
@@ -60,3 +61,7 @@ bin/rigol5000_querywaveform$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(
 bin/siglentssg3021x_idn$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssg3021x_idn/siglentssg3021x_idn.c
 
 	$(CCBIN) -o bin/siglentssg3021x_idn$(EXESUFFIX) src/siglentssg3021x_idn/siglentssg3021x_idn.c $(CCBINSUFFIX)
+
+bin/siglentssg3021x_rfonoff$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssg3021x_rfonoff/siglentssg3021x_rfonoff.c
+
+	$(CCBIN) -o bin/siglentssg3021x_rfonoff$(EXESUFFIX) src/siglentssg3021x_rfonoff/siglentssg3021x_rfonoff.c $(CCBINSUFFIX)

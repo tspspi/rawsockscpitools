@@ -59,10 +59,34 @@ static enum labError siglentSSG3021xImpl__IDN(
     return e;
 }
 
+static enum labError siglentSSG3021xImpl___RFOutputEnable(
+    struct siglentSSG3021x* lpDevice,
+    bool bEnable
+) {
+    enum labError e;
+    struct siglentSSG3021xImpl* lpThis;
+    char buffer[128];
+
+    if(lpDevice == NULL) { return labE_InvalidParam; }
+    lpThis = (struct siglentSSG3021xImpl*)(lpDevice->lpReserved);
+
+    if(bEnable != false) {
+        sprintf(buffer, ":OUTP ON\n");
+    } else {
+        sprintf(buffer, ":OUTP OFF\n");
+    }
+
+    e = labScpiCommand_NoReply(lpThis->hSocket, buffer, strlen(buffer));
+    return e;
+}
+
+
 
 static struct siglentSSG3021x_Vtbl siglentSSG3021xImpl__DefaultVTBL = {
     siglentSSG3021xImpl__Disconnect,
-    &siglentSSG3021xImpl__IDN
+    &siglentSSG3021xImpl__IDN,
+
+    &siglentSSG3021xImpl___RFOutputEnable
 };
 
 
