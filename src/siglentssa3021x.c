@@ -125,6 +125,86 @@ static enum labError siglentSSA3021xImpl__SetAverageCount(
     return labE_Ok;
 }
 
+static char* siglentSSA3021xImpl__QueryTraceData__SCPI_StartFreq = ":FREQ:STAR?\n";
+static char* siglentSSA3021xImpl__QueryTraceData__SCPI_StopFreq = ":FREQ:STOP?\n";
+static char* siglentSSA3021xImpl__QueryTraceData__SCPI_QueryTrace = ":TRAC:DATA? 1\n";
+
+static enum labError siglentSSA3021xImpl__QueryTraceData(
+    struct siglentSSA3021x* lpDevice,
+    struct spectrumDataTrace** lpTraceOut
+) {
+    enum labError e;
+    struct siglentSSA3021xImpl* lpThis;
+    struct spectrumDataTrace* lpResult;
+
+    unsigned long int i;
+    unsigned long int idxMeasurement;
+
+    char* lpRecvTemp;
+    unsigned long int dwRecvTemp;
+
+    double dStartFreq;
+    double dStopFreq;
+    double dFrqStep;
+    unsigned long int measCount;
+
+    if(lpTraceOut != NULL) { (*lpTraceOut) = NULL; }
+
+    if((lpDevice == NULL) || (lpTraceOut == NULL)) { return labE_InvalidParam; }
+    lpThis = (struct siglentSSA3021xImpl*)(lpDevice->lpReserved);
+
+    /* Query required parameters ... */
+    if((e = labScpiCommand(lpThis->hSocket, siglentSSA3021xImpl__QueryTraceData__SCPI_StartFreq, strlen(siglentSSA3021xImpl__QueryTraceData__SCPI_StartFreq), &lpRecvTemp, &dwRecvTemp)) != labE_Ok) { return e; }
+    if(sscanf(lpRecvTemp, "%lf", &dStartFreq) != 1) { free(lpRecvTemp); return labE_Failed; } else { free(lpRecvTemp); }
+    if((e = labScpiCommand(lpThis->hSocket, siglentSSA3021xImpl__QueryTraceData__SCPI_StopFreq, strlen(siglentSSA3021xImpl__QueryTraceData__SCPI_StopFreq), &lpRecvTemp, &dwRecvTemp)) != labE_Ok) { return e; }
+    if(sscanf(lpRecvTemp, "%lf", &dStopFreq) != 1) { free(lpRecvTemp); return labE_Failed; } else { free(lpRecvTemp); }
+
+    if((e = labScpiCommand(lpThis->hSocket, siglentSSA3021xImpl__QueryTraceData__SCPI_QueryTrace, strlen(siglentSSA3021xImpl__QueryTraceData__SCPI_QueryTrace), &lpRecvTemp, &dwRecvTemp)) != labE_Ok) { return e; }
+
+    /*
+        Parse trace data by simply using sscanf
+        replace , by 0; scan after every 0 till the end ...
+    */
+    measCount = 0;
+    for(i = 0; i < dwRecvTemp; i=i+1) {
+        if(lpRecvTemp[i] == ',') {
+            lpRecvTemp[i] = 0x00;
+            measCount = measCount + 1;
+        }
+    }
+
+    dFrqStep = (dStopFreq-dStartFreq)/(measCount-1);
+
+    lpResult = (struct spectrumDataTrace*)malloc(sizeof(struct spectrumDataTrace) + sizeof(((struct spectrumDataTrace*)0)->data[0])*measCount);
+    if(lpResult == NULL) {
+        free(lpRecvTemp);
+        return labE_OutOfMemory;
+    }
+
+    lpResult->dwDataPoints = measCount;
+    lpResult->frqStep = dFrqStep;
+    lpResult->frqStart = dStartFreq;
+    lpResult->frqEnd = dStopFreq;
+    lpResult->frqCenter = (dStartFreq + dStopFreq) / 2.0;
+
+    idxMeasurement = 0;
+    sscanf(lpRecvTemp, "%lf", &(lpResult->data[idxMeasurement].value));
+    lpResult->data[idxMeasurement].frq = dStartFreq;
+    idxMeasurement = idxMeasurement + 1;
+
+    for(i = 0; i < dwRecvTemp; i=i+1) {
+        if((lpRecvTemp[i] == 0x00) && ((dwRecvTemp-i) > 2)) {
+            sscanf(&(lpRecvTemp[i+1]), "%lf", &(lpResult->data[idxMeasurement].value));
+            lpResult->data[idxMeasurement].frq = dStartFreq + i * dFrqStep;
+            idxMeasurement = idxMeasurement + 1;
+        }
+    }
+
+    free(lpRecvTemp);
+    (*lpTraceOut) = lpResult;
+    return labE_Ok;
+}
+
 
 static struct siglentSSA3021x_Vtbl siglentSSA3021xImpl__DefaultVTBL = {
     &siglentSSA3021xImpl__Disconnect,
@@ -132,7 +212,9 @@ static struct siglentSSA3021x_Vtbl siglentSSA3021xImpl__DefaultVTBL = {
 
     &siglentSSA3021xImpl__SetFrequencyCenter,
     &siglentSSA3021xImpl__SetSpan,
-    &siglentSSA3021xImpl__SetAverageCount
+    &siglentSSA3021xImpl__SetAverageCount,
+
+    &siglentSSA3021xImpl__QueryTraceData
 };
 
 static char* siglentSSA3021xConnect__Signature = "Siglent Technologies,SSA3021X,";

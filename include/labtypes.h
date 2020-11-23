@@ -38,7 +38,18 @@ struct oscilloscopeWaveformData {
     double dData[];
 };
 
+struct spectrumDataTrace {
+    unsigned long int dwDataPoints;
+    double frqStart;
+    double frqEnd;
+    double frqStep;
+    double frqCenter;
 
+    struct {
+        double frq;
+        double value;
+    } data[];
+};
 
 /*
     SCPI helper functions used by the libraries themselves

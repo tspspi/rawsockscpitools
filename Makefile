@@ -21,7 +21,8 @@ TOOLS=bin/rigol5000_idn$(EXESUFFIX) \
 	bin/siglentssa3021x_idn$(EXESUFFIX) \
 	bin/siglentssa3021x_setfrq$(EXESUFFIX) \
 	bin/siglentssa3021x_setspan$(EXESUFFIX) \
-	bin/siglentssa3021x_avg$(EXESUFFIX)
+	bin/siglentssa3021x_avg$(EXESUFFIX) \
+	bin/siglentssa3021x_querytrace$(EXESUFFIX)
 
 
 OBJS=tmp/rigolmso5000.o \
@@ -33,6 +34,7 @@ GENINCLUDES=include/labtypes.h
 
 all: $(LIBS) $(TOOLS)
 
+experiments: $(LIBS) bin/sweepSSG3021_SSA3021$(EXESUFFIX)
 
 bin/librawsockscpitools$(SLIBSUFFIX): $(OBJS)
 
@@ -102,3 +104,14 @@ bin/siglentssa3021x_setspan$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(
 bin/siglentssa3021x_avg$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssa3021x_avg/siglentssa3021x_avg.c
 
 	$(CCBIN) -o bin/siglentssa3021x_avg$(EXESUFFIX) src/siglentssa3021x_avg/siglentssa3021x_avg.c $(CCBINSUFFIX)
+
+bin/siglentssa3021x_querytrace$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssa3021x_querytrace/siglentssa3021x_querytrace.c
+
+	$(CCBIN) -o bin/siglentssa3021x_querytrace$(EXESUFFIX) src/siglentssa3021x_querytrace/siglentssa3021x_querytrace.c $(CCBINSUFFIX)
+
+
+# Some experimental tasks
+
+bin/sweepSSG3021_SSA3021$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) experiments/sweepSSG3021_SSA3021.c
+
+	$(CCBIN) -o bin/sweepSSG3021_SSA3021$(EXESUFFIX) experiments/sweepSSG3021_SSA3021.c $(CCBINSUFFIX)

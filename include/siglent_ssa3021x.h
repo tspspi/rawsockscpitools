@@ -31,7 +31,10 @@ typedef enum labError (*lpfnSiglentSSA3021X_SetAverageCount)(
     unsigned long int dwCount
 );
 
-
+typedef enum labError (*lpfnSiglentSSG3021X_QueryTraceData)(
+    struct siglentSSA3021x* lpDevice,
+    struct spectrumDataTrace** lpTraceOut
+);
 
 struct siglentSSA3021x_Vtbl {
     lpfnSiglentSSA3021X_Disconnect          disconnect;
@@ -40,6 +43,7 @@ struct siglentSSA3021x_Vtbl {
     lpfnSiglentSSA3021X_SetFrequencyCenter  setFrequencyCenter;
     lpfnSiglentSSA3021X_SetSpan             setSpan;
     lpfnSiglentSSA3021X_SetAverageCount     setAverageCount;
+    lpfnSiglentSSG3021X_QueryTraceData      queryTraceData;
 };
 
 struct siglentSSA3021x {
