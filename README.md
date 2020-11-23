@@ -32,6 +32,8 @@ make
 
 * Oscilloscopes
    * RIGOL MSO5072
+* Signal generators
+   * SIGLENT SSG3021X
 
 # Supported operations
 
@@ -39,3 +41,6 @@ make
    * ```rigolmso5000_idn``` queries the identity string and serial number
    * ```rigolmso5000_querywaveform``` queries the waveform from a selected
      channel into an ASCII data file using the currently selected settings
+* SIGLENT SSG3021X
+   * ```siglentssg3021x_idn``` queries the identity string and serial number
+   * ```siglentSSG3021x_rfonoff``` enables or disables the RF output
