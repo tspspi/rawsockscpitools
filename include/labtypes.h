@@ -24,6 +24,12 @@ enum labError {
     labE_AddressNotResolvable,
 
     labE_UnknownDevice,
+
+
+
+
+
+    labE_NotImplemented
 };
 
 

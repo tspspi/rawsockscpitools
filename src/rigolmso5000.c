@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
@@ -8,10 +9,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-
-#ifdef DEBUG
-    #include <stdio.h>
-#endif
 
 #include "../include/labtypes.h"
 #include "../include/rigolmso5000.h"
@@ -71,12 +68,126 @@ static enum labError (mso5000DeviceImpl__IDN)(
     return e;
 }
 
+static enum labError (mso5000DeviceImpl__SetChannelEnable)(
+    struct rigolMso5000* lpDevice,
+
+    unsigned long int dwChannel,
+    bool bEnabled
+) {
+    enum labError e;
+    struct mso5000DeviceImpl* lpThis;
+    char buffer[128];
+
+    if(lpDevice == NULL) { return labE_InvalidParam; }
+
+    lpThis = (struct mso5000DeviceImpl*)(lpDevice->lpReserved);
+
+    switch(lpThis->devType) {
+        case mso5000DeviceFamily_MSO5072:
+            if(dwChannel > 4) {
+                return labE_InvalidParam;
+            }
+            break;
+        default:
+            return labE_NotImplemented;
+    }
+
+    sprintf(buffer, ":CHAN%lu:DISP %s\n", dwChannel, ((bEnabled == true) ? "ON" : "OFF"));
+
+    e = labScpiCommand_NoReply(lpThis->hSocket, buffer, strlen(buffer));
+
+    return e;
+}
+
+static char* mso5000DeviceImpl__QueryWaveform__SCPICmd_WavModeNorm = ":WAV:MODE NORM\n";
+static char* mso5000DeviceImpl__QueryWaveform__SCPICmd_WavFormAscii = ":WAV:FORM ASCii\n";
+static char* mso5000DeviceImpl__QueryWaveform__SCPICmd_WavData = ":WAV:DATA?\n";
+
+static enum labError (mso5000DeviceImpl__QueryWaveform)(
+    struct rigolMso5000* lpDevice,
+
+    unsigned long int dwChannel,
+    struct oscilloscopeWaveformData** lpWaveformOut
+) {
+    enum labError e;
+    struct mso5000DeviceImpl* lpThis;
+
+    unsigned long int dwASCIILen;
+    unsigned long int i;
+    unsigned long int measCount;
+    unsigned long int idxMeasurement;
+    char* lpASCIIData;
+    struct oscilloscopeWaveformData* lpTrace;
+    char bCommand[128];
+
+    if(lpWaveformOut != NULL) { (*lpWaveformOut) = NULL; }
+
+    if(lpDevice == NULL) { return labE_InvalidParam; }
+    if(lpWaveformOut == NULL) { return labE_InvalidParam; }
+
+    lpThis = (struct mso5000DeviceImpl*)(lpDevice->lpReserved);
+
+    switch(lpThis->devType) {
+        case mso5000DeviceFamily_MSO5072:
+            if(dwChannel > 4) {
+                return labE_InvalidParam;
+            }
+            break;
+        default:
+            return labE_NotImplemented;
+    }
+
+    /*
+        First we set the waveform source to the desired channel
+    */
+    sprintf(bCommand, ":WAV:SOUR CHAN%lu\n", dwChannel);
+    if((e = labScpiCommand_NoReply(lpThis->hSocket, bCommand, strlen(bCommand))) != labE_Ok) { return e; }
+
+    /*
+        Set waveform mode to normal and ASCII (ToDo: Binary would be better)
+    */
+    if((e = labScpiCommand_NoReply(lpThis->hSocket, mso5000DeviceImpl__QueryWaveform__SCPICmd_WavModeNorm, strlen(mso5000DeviceImpl__QueryWaveform__SCPICmd_WavModeNorm))) != labE_Ok) { return e; }
+    if((e = labScpiCommand_NoReply(lpThis->hSocket, mso5000DeviceImpl__QueryWaveform__SCPICmd_WavFormAscii, strlen(mso5000DeviceImpl__QueryWaveform__SCPICmd_WavFormAscii))) != labE_Ok) { return e; }
+
+    /*
+        Now receive waveform data
+    */
+    if((e = labScpiCommand(lpThis->hSocket, mso5000DeviceImpl__QueryWaveform__SCPICmd_WavData, strlen(mso5000DeviceImpl__QueryWaveform__SCPICmd_WavData), &lpASCIIData, &dwASCIILen)) != labE_Ok) { return e; }
+
+    /*
+        Parse trace data by simply using sscanf
+        replace , by 0; scan after every 0 till the end ...
+    */
+    measCount = 0;
+    for(i = 11; i < dwASCIILen; i=i+1) {
+        if(lpASCIIData[i] == ',') {
+            lpASCIIData[i] = 0x00;
+            measCount = measCount + 1;
+        }
+    }
+
+    lpTrace = (struct oscilloscopeWaveformData*)malloc(sizeof(struct oscilloscopeWaveformData) + sizeof(double)*measCount);
+    lpTrace->dwDataPoints = measCount;
+
+    idxMeasurement = 0;
+    for(i = 10; i < dwASCIILen; i=i+1) {
+        if((lpASCIIData[i] == 0x00) && ((dwASCIILen-i) > 2)) {
+            sscanf(&(lpASCIIData[i+1]), "%lf", &(lpTrace->dData[idxMeasurement]));
+            idxMeasurement = idxMeasurement + 1;
+        }
+    }
+
+    free(lpASCIIData);
+
+    (*lpWaveformOut) = lpTrace;
+    return labE_Ok;
+}
 
 static struct rigolMso5000_Vtbl rigolMso5000_DefaultVTBL = {
     &mso5000DeviceImpl__Disconnect,
     &mso5000DeviceImpl__IDN,
-    NULL,
-    NULL
+    &mso5000DeviceImpl__SetChannelEnable,
+    &mso5000DeviceImpl__QueryWaveform
 };
 
 static char* rigolMso5000__Signature_MSO5072 = "RIGOL TECHNOLOGIES,MSO5072,";
