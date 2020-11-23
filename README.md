@@ -35,7 +35,11 @@ make
 * Signal generators
    * SIGLENT SSG3021X
 
-# Supported operations
+# Mini CLI tools / examples
+
+The following CLI tools are supplied along with the libraries to allow fast
+scripting of simple tasks. For more complex tasks one should use the library
+directly. These CLI tools also serve as examples on how to use the API.
 
 * RIGOL MSO5072
    * ```rigolmso5000_idn``` queries the identity string and serial number
@@ -43,4 +47,6 @@ make
      channel into an ASCII data file using the currently selected settings
 * SIGLENT SSG3021X
    * ```siglentssg3021x_idn``` queries the identity string and serial number
-   * ```siglentSSG3021x_rfonoff``` enables or disables the RF output
+   * ```siglentssg3021x_rfonoff``` enables or disables the RF output
+   * ```siglentssg3021x_setfrq``` sets the frequency (in Hz) on the RF output
+   * ```siglentssg3021x_setpow``` sets the power (in dBm) on the RF output
