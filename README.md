@@ -5,9 +5,9 @@ Berkeley sockets to communicate with laboratory equipment
 using SCPI. These tools only support a small subset of
 SCPI and the device commands - and do not provide any device
 family abstraction or device abstraction layer like libscpi.
-These tools have been developed to play around with SCPI,
-test how commands work and solve some specific scriptable
-problems.
+These tools have been written as a quick hack to play around
+with SCPI, test how commands work and solve some specific
+scriptable problems.
 
 # License
 
