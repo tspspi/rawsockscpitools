@@ -105,8 +105,6 @@ static enum labError siglentSSA3021xImpl__SetAverageCount(
     enum labError e;
     struct siglentSSA3021xImpl* lpThis;
     char buffer[128];
-    char* lpReceived;
-    unsigned long int dwReceivedLen;
 
     if(lpDevice == NULL) { return labE_InvalidParam; }
     lpThis = (struct siglentSSA3021xImpl*)(lpDevice->lpReserved);
@@ -116,15 +114,11 @@ static enum labError siglentSSA3021xImpl__SetAverageCount(
 
     if(dwCount == 1) {
         /* Set trace mode to normal ... disables averaging */
-        if((e = labScpiCommand(lpThis->hSocket, siglentSSA3021xImpl__SetAverageCount__MODE_WRITE, strlen(siglentSSA3021xImpl__SetAverageCount__MODE_WRITE), &lpReceived, &dwReceivedLen)) != labE_Ok) { return e; }
-        free(lpReceived);
+        if((e = labScpiCommand_NoReply(lpThis->hSocket, siglentSSA3021xImpl__SetAverageCount__MODE_WRITE, strlen(siglentSSA3021xImpl__SetAverageCount__MODE_WRITE))) != labE_Ok) { return e; }
     } else {
-        if((e = labScpiCommand(lpThis->hSocket, siglentSSA3021xImpl__SetAverageCount__MODE_AVERAGE, strlen(siglentSSA3021xImpl__SetAverageCount__MODE_AVERAGE), &lpReceived, &dwReceivedLen)) != labE_Ok) { return e; }
-        free(lpReceived);
-
+        if((e = labScpiCommand_NoReply(lpThis->hSocket, siglentSSA3021xImpl__SetAverageCount__MODE_AVERAGE, strlen(siglentSSA3021xImpl__SetAverageCount__MODE_AVERAGE))) != labE_Ok) { return e; }
         sprintf(buffer, ":AVER:TRAC1:COUN %lu\n", dwCount);
-        if((e = labScpiCommand(lpThis->hSocket, buffer, strlen(buffer), &lpReceived, &dwReceivedLen)) != labE_Ok) { return e; }
-        free(lpReceived);
+        if((e = labScpiCommand_NoReply(lpThis->hSocket, buffer, strlen(buffer))) != labE_Ok) { return e; }
         if((e = labScpiCommand_NoReply(lpThis->hSocket, siglentSSA3021xImpl__SetAverageCount__AVG_CLEAR, strlen(siglentSSA3021xImpl__SetAverageCount__AVG_CLEAR))) != labE_Ok) { return e; }
     }
 

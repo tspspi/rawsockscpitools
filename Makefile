@@ -20,7 +20,9 @@ TOOLS=bin/rigol5000_idn$(EXESUFFIX) \
 	bin/siglentssg3021x_setpow$(EXESUFFIX) \
 	bin/siglentssa3021x_idn$(EXESUFFIX) \
 	bin/siglentssa3021x_setfrq$(EXESUFFIX) \
-	bin/siglentssa3021x_setspan$(EXESUFFIX)
+	bin/siglentssa3021x_setspan$(EXESUFFIX) \
+	bin/siglentssa3021x_avg$(EXESUFFIX)
+
 
 OBJS=tmp/rigolmso5000.o \
 	tmp/scpicommand.o \
@@ -96,3 +98,7 @@ bin/siglentssa3021x_setfrq$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(G
 bin/siglentssa3021x_setspan$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssa3021x_setspan/siglentssa3021x_setspan.c
 
 	$(CCBIN) -o bin/siglentssa3021x_setspan$(EXESUFFIX) src/siglentssa3021x_setspan/siglentssa3021x_setspan.c $(CCBINSUFFIX)
+
+bin/siglentssa3021x_avg$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssa3021x_avg/siglentssa3021x_avg.c
+
+	$(CCBIN) -o bin/siglentssa3021x_avg$(EXESUFFIX) src/siglentssa3021x_avg/siglentssa3021x_avg.c $(CCBINSUFFIX)
