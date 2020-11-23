@@ -18,18 +18,33 @@ typedef enum labError (*lpfnSiglentSSA3021X_IDN)(
     unsigned long int* lpResultLenOut
 );
 
-
+typedef enum labError (*lpfnSiglentSSA3021X_SetFrequencyCenter)(
+    struct siglentSSA3021x* lpDevice,
+    double dFrequencyHz
+);
+typedef enum labError (*lpfnSiglentSSA3021X_SetSpan)(
+    struct siglentSSA3021x* lpDevice,
+    double dSpanHz
+);
+typedef enum labError (*lpfnSiglentSSA3021X_SetAverageCount)(
+    struct siglentSSA3021x* lpDevice,
+    unsigned long int dwCount
+);
 
 
 
 struct siglentSSA3021x_Vtbl {
-    lpfnSiglentSSA3021X_Disconnect  disconnect;
-    lpfnSiglentSSA3021X_IDN         idn;
+    lpfnSiglentSSA3021X_Disconnect          disconnect;
+    lpfnSiglentSSA3021X_IDN                 idn;
+
+    lpfnSiglentSSA3021X_SetFrequencyCenter  setFrequencyCenter;
+    lpfnSiglentSSA3021X_SetSpan             setSpan;
+    lpfnSiglentSSA3021X_SetAverageCount     setAverageCount;
 };
 
 struct siglentSSA3021x {
-    struct siglentSSA3021x_Vtbl*    vtbl;
-    void*                           lpReserved;
+    struct siglentSSA3021x_Vtbl*            vtbl;
+    void*                                   lpReserved;
 };
 
 enum labError siglentSSA3021xConnect(

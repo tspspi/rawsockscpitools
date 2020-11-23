@@ -18,7 +18,9 @@ TOOLS=bin/rigol5000_idn$(EXESUFFIX) \
 	bin/siglentssg3021x_rfonoff$(EXESUFFIX) \
 	bin/siglentssg3021x_setfrq$(EXESUFFIX) \
 	bin/siglentssg3021x_setpow$(EXESUFFIX) \
-	bin/siglentssa3021x_idn$(EXESUFFIX)
+	bin/siglentssa3021x_idn$(EXESUFFIX) \
+	bin/siglentssa3021x_setfrq$(EXESUFFIX) \
+	bin/siglentssa3021x_setspan$(EXESUFFIX)
 
 OBJS=tmp/rigolmso5000.o \
 	tmp/scpicommand.o \
@@ -86,3 +88,11 @@ bin/siglentssg3021x_setpow$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(G
 bin/siglentssa3021x_idn$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssa3021x_idn/siglentssa3021x_idn.c
 
 	$(CCBIN) -o bin/siglentssa3021x_idn$(EXESUFFIX) src/siglentssa3021x_idn/siglentssa3021x_idn.c $(CCBINSUFFIX)
+
+bin/siglentssa3021x_setfrq$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssa3021x_setfrq/siglentssa3021x_setfrq.c
+
+	$(CCBIN) -o bin/siglentssa3021x_setfrq$(EXESUFFIX) src/siglentssa3021x_setfrq/siglentssa3021x_setfrq.c $(CCBINSUFFIX)
+
+bin/siglentssa3021x_setspan$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssa3021x_setspan/siglentssa3021x_setspan.c
+
+	$(CCBIN) -o bin/siglentssa3021x_setspan$(EXESUFFIX) src/siglentssa3021x_setspan/siglentssa3021x_setspan.c $(CCBINSUFFIX)
