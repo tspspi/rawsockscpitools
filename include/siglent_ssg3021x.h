@@ -22,6 +22,14 @@ typedef enum labError (*lpfnSiglentSSG3021X_RFOutputEnable)(
     bool bEnable
 );
 
+typedef enum labError (*lpfnSiglentSSG3021X_RFSetFrequency)(
+    struct siglentSSG3021x* lpDevice,
+    unsigned long int dwFrequencyHz
+);
+typedef enum labError (*lpfnSiglentSSG3021X_RFSetPower)(
+    struct siglentSSG3021x* lpDevice,
+    float power
+);
 
 
 struct siglentSSG3021x_Vtbl {
@@ -29,6 +37,8 @@ struct siglentSSG3021x_Vtbl {
     lpfnSiglentSSG3021X_IDN                     idn;
 
     lpfnSiglentSSG3021X_RFOutputEnable          rfOutEnable;
+    lpfnSiglentSSG3021X_RFSetFrequency          rfSetFrequency;
+    lpfnSiglentSSG3021X_RFSetPower              rfSetPower;
 };
 struct siglentSSG3021x {
     struct siglentSSG3021x_Vtbl*                vtbl;

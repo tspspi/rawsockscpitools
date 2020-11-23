@@ -80,13 +80,55 @@ static enum labError siglentSSG3021xImpl___RFOutputEnable(
     return e;
 }
 
+static enum labError siglentSSG3021xImpl___RFSetFrequency(
+    struct siglentSSG3021x* lpDevice,
+    unsigned long int dwFrequencyHz
+) {
+    enum labError e;
+    struct siglentSSG3021xImpl* lpThis;
+    char buffer[128];
+
+    if(lpDevice == NULL) { return labE_InvalidParam; }
+    if(dwFrequencyHz < 1000000) { return labE_InvalidParam; } /* Frequencies below 1 MHz are not supported on the RF output */
+    if(dwFrequencyHz > 2100000000) { return labE_InvalidParam; } /* Frequencies above 2.1 GHz are not supported on the RF output */
+
+    lpThis = (struct siglentSSG3021xImpl*)(lpDevice->lpReserved);
+
+    sprintf(buffer, ":FREQ %lu Hz\n", dwFrequencyHz);
+
+    e = labScpiCommand_NoReply(lpThis->hSocket, buffer, strlen(buffer));
+
+    return e;
+}
+static enum labError siglentSSG3021xImpl___RFSetPower(
+    struct siglentSSG3021x* lpDevice,
+    float power
+) {
+    enum labError e;
+    struct siglentSSG3021xImpl* lpThis;
+    char buffer[128];
+
+    if(lpDevice == NULL) { return labE_InvalidParam; }
+    if(power < -110.0) { return labE_InvalidParam; } /* Output power lower than -110.0 dBm is not supported */
+    if(power > 20.0) { return labE_InvalidParam; } /* Output power higher than +20.0 dBm is not supported */
+
+    lpThis = (struct siglentSSG3021xImpl*)(lpDevice->lpReserved);
+
+    sprintf(buffer, ":POW %f dBm\n", power);
+
+    e = labScpiCommand_NoReply(lpThis->hSocket, buffer, strlen(buffer));
+
+    return e;
+}
 
 
 static struct siglentSSG3021x_Vtbl siglentSSG3021xImpl__DefaultVTBL = {
     siglentSSG3021xImpl__Disconnect,
     &siglentSSG3021xImpl__IDN,
 
-    &siglentSSG3021xImpl___RFOutputEnable
+    &siglentSSG3021xImpl___RFOutputEnable,
+    &siglentSSG3021xImpl___RFSetFrequency,
+    &siglentSSG3021xImpl___RFSetPower
 };
 
 
