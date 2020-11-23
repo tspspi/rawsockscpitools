@@ -34,6 +34,8 @@ make
    * RIGOL MSO5072
 * Signal generators
    * SIGLENT SSG3021X
+* Signal analyzers
+   * SIGLENT SSA3021X
 
 # Mini CLI tools / examples
 
@@ -50,3 +52,5 @@ directly. These CLI tools also serve as examples on how to use the API.
    * ```siglentssg3021x_rfonoff``` enables or disables the RF output
    * ```siglentssg3021x_setfrq``` sets the frequency (in Hz) on the RF output
    * ```siglentssg3021x_setpow``` sets the power (in dBm) on the RF output
+* SIGLENT SSA3021X
+   * ```siglentssa3021x_idn``` queries the identity string and serial number

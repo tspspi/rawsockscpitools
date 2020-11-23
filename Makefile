@@ -15,11 +15,15 @@ LIBS=bin/librawsockscpitools$(SLIBSUFFIX) \
 TOOLS=bin/rigol5000_idn$(EXESUFFIX) \
 	bin/rigol5000_querywaveform$(EXESUFFIX) \
 	bin/siglentssg3021x_idn$(EXESUFFIX) \
-	bin/siglentssg3021x_rfonoff$(EXESUFFIX)
+	bin/siglentssg3021x_rfonoff$(EXESUFFIX) \
+	bin/siglentssg3021x_setfrq$(EXESUFFIX) \
+	bin/siglentssg3021x_setpow$(EXESUFFIX) \
+	bin/siglentssa3021x_idn$(EXESUFFIX)
 
 OBJS=tmp/rigolmso5000.o \
 	tmp/scpicommand.o \
-	tmp/siglentssg3021x.o
+	tmp/siglentssg3021x.o \
+	tmp/siglentssa3021x.o
 
 GENINCLUDES=include/labtypes.h
 
@@ -48,6 +52,11 @@ tmp/siglentssg3021x.o: $(GENINCLUDES) include/siglent_ssg3021x.h src/siglentssg3
 
 	$(CCOBJ) -o tmp/siglentssg3021x.o src/siglentssg3021x.c
 
+tmp/siglentssa3021x.o: $(GENINCLUDES) include/siglent_ssa3021x.h src/siglentssa3021x.c
+
+	$(CCOBJ) -o tmp/siglentssa3021x.o src/siglentssa3021x.c
+
+
 # Tooling
 
 bin/rigol5000_idn$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/rigolmso5000_idn/rigol5000_idn.c
@@ -65,3 +74,15 @@ bin/siglentssg3021x_idn$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENI
 bin/siglentssg3021x_rfonoff$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssg3021x_rfonoff/siglentssg3021x_rfonoff.c
 
 	$(CCBIN) -o bin/siglentssg3021x_rfonoff$(EXESUFFIX) src/siglentssg3021x_rfonoff/siglentssg3021x_rfonoff.c $(CCBINSUFFIX)
+
+bin/siglentssg3021x_setfrq$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssg3021x_setfrq/siglentssg3021x_setfrq.c
+
+	$(CCBIN) -o bin/siglentssg3021x_setfrq$(EXESUFFIX) src/siglentssg3021x_setfrq/siglentssg3021x_setfrq.c $(CCBINSUFFIX)
+
+bin/siglentssg3021x_setpow$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssg3021x_setpow/siglentssg3021x_setpow.c
+
+	$(CCBIN) -o bin/siglentssg3021x_setpow$(EXESUFFIX) src/siglentssg3021x_setpow/siglentssg3021x_setpow.c $(CCBINSUFFIX)
+
+bin/siglentssa3021x_idn$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssa3021x_idn/siglentssa3021x_idn.c
+
+	$(CCBIN) -o bin/siglentssa3021x_idn$(EXESUFFIX) src/siglentssa3021x_idn/siglentssa3021x_idn.c $(CCBINSUFFIX)
