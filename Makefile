@@ -13,10 +13,12 @@ LIBS=bin/librawsockscpitools$(SLIBSUFFIX) \
 	bin/librawsockscpitools$(DYNLIBSUFFIX)
 
 TOOLS=bin/rigol5000_idn$(EXESUFFIX) \
-	bin/rigol5000_querywaveform$(EXESUFFIX)
+	bin/rigol5000_querywaveform$(EXESUFFIX) \
+	bin/siglentssg3021x_idn$(EXESUFFIX)
 
 OBJS=tmp/rigolmso5000.o \
-	tmp/scpicommand.o
+	tmp/scpicommand.o \
+	tmp/siglentssg3021x.o
 
 GENINCLUDES=include/labtypes.h
 
@@ -41,6 +43,10 @@ tmp/rigolmso5000.o: $(GENINCLUDES) include/rigolmso5000.h src/rigolmso5000.c
 
 	$(CCOBJ) -o tmp/rigolmso5000.o src/rigolmso5000.c
 
+tmp/siglentssg3021x.o: $(GENINCLUDES) include/siglent_ssg3021x.h src/siglentssg3021x.c
+
+	$(CCOBJ) -o tmp/siglentssg3021x.o src/siglentssg3021x.c
+
 # Tooling
 
 bin/rigol5000_idn$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/rigolmso5000_idn/rigol5000_idn.c
@@ -50,3 +56,7 @@ bin/rigol5000_idn$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDE
 bin/rigol5000_querywaveform$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/rigolmso5000_querywaveform/rigol5000_querywaveform.c
 
 	$(CCBIN) -o bin/rigol5000_querywaveform$(EXESUFFIX) src/rigolmso5000_querywaveform/rigol5000_querywaveform.c $(CCBINSUFFIX)
+
+bin/siglentssg3021x_idn$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/siglentssg3021x_idn/siglentssg3021x_idn.c
+
+	$(CCBIN) -o bin/siglentssg3021x_idn$(EXESUFFIX) src/siglentssg3021x_idn/siglentssg3021x_idn.c $(CCBINSUFFIX)
