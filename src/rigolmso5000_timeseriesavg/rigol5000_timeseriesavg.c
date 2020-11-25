@@ -103,6 +103,7 @@ int main(int argc, char* argv[]) {
 
         printf("%lf ... ", avgSum);
         fprintf(fHandle, "%lu %lf\n", (iStep * uDelay * 1000), avgSum);
+        fflush(fHandle);
 
 
         printTime(uDelay * (nSteps - iStep)); printf(" remaining\n");
