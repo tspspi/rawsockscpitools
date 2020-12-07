@@ -35,7 +35,7 @@ GENINCLUDES=include/labtypes.h
 
 all: $(LIBS) $(TOOLS)
 
-experiments: $(LIBS) bin/sweepSSG3021_SSA3021$(EXESUFFIX)
+experiments: $(LIBS) bin/sweepSSG3021_SSA3021$(EXESUFFIX) bin/sweepSSG3021_RigolAVG$(EXESUFFIX)
 
 bin/librawsockscpitools$(SLIBSUFFIX): $(OBJS)
 
@@ -119,3 +119,7 @@ bin/rigolmso5000_timeseriesavg$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX)
 bin/sweepSSG3021_SSA3021$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) experiments/sweepSSG3021_SSA3021.c
 
 	$(CCBIN) -o bin/sweepSSG3021_SSA3021$(EXESUFFIX) experiments/sweepSSG3021_SSA3021.c $(CCBINSUFFIX)
+
+bin/sweepSSG3021_RigolAVG$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) experiments/sweepSSG3021_RigolAVG.c
+
+	$(CCBIN) -o bin/sweepSSG3021_RigolAVG$(EXESUFFIX) experiments/sweepSSG3021_RigolAVG.c $(CCBINSUFFIX)
