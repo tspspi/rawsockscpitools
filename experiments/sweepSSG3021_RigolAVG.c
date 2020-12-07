@@ -159,6 +159,7 @@ int main(int argc, char* argv[]) {
             dSigmaSQ2 = sqrt(dSigmaSQ2 / ((double)lpWaveform[1]->dwDataPoints));
 
             fprintf(fHandle, "%lu %lf %lf %lf %lf %lf %lf %lf %lf\n", dwSweepFrequency, dAvg1, dAvg2, dSigma1, dSigma2, dAvgSQ1, dAvgSQ2, dSigmaSQ1, dSigmaSQ2);
+            fflush(fHandle);
             printf("Sampled at %lu HZ, measured %lf (stddev %lf) and %lf (dev %lf)\n", dwSweepFrequency, dAvg1, dSigma1, dAvg2, dSigma2); fflush(stdout);
             printf("\tabsolute: measured %lf (stddev %lf) and %lf (dev %lf)\n", dAvgSQ1, dSigmaSQ1, dAvgSQ2, dSigmaSQ2); fflush(stdout);
         }
