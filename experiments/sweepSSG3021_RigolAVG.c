@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 
 #include <unistd.h>
 
@@ -101,7 +102,7 @@ int main(int argc, char* argv[]) {
     printf("Starting sweep from %lu to %lu\n", hzStart, hzEnd);
     double dStep = ((double)(hzEnd - hzStart) / (double)nSteps);
 
-    fprintf(fHandle, "# GeneratorHz     Amplitude average WS        Amplitude average ANT");
+    fprintf(fHandle, "# GeneratorHz     Amplitude average WS        Amplitude average ANT       Sigma WS            Sigma ANT       AmplitudeSquared WS     AmplitudeSquared ANT        SigmaAmplitudeSquared WS     SigmaAmplitudeSquared ANT");
     for(dwSweepFrequency = hzStart; dwSweepFrequency < hzEnd; dwSweepFrequency = dwSweepFrequency + dStep) {
         if((e = lpSSG3021X->vtbl->rfSetFrequency(lpSSG3021X, dwSweepFrequency)) != labE_Ok) { goto cleanup; }
         usleep(500000);
@@ -113,9 +114,14 @@ int main(int argc, char* argv[]) {
         {
             double dAvg1 = 0.0;
             double dAvg2 = 0.0;
+            double dAvgSQ1 = 0.0;
+            double dAvgSQ2 = 0.0;
+
 
             double dSigma1 = 0.0;
             double dSigma2 = 0.0;
+            double dSigmaSQ1 = 0.0;
+            double dSigmaSQ2 = 0.0;
 
             for(i = 0; i < lpWaveform[0]->dwDataPoints; i=i+1) {
                 dAvg1 = dAvg1 + lpWaveform[0]->dData[i];
@@ -123,8 +129,16 @@ int main(int argc, char* argv[]) {
             for(i = 0; i < lpWaveform[1]->dwDataPoints; i=i+1) {
                 dAvg2 = dAvg2 + lpWaveform[1]->dData[i];
             }
+            for(i = 0; i < lpWaveform[0]->dwDataPoints; i=i+1) {
+                dAvgSQ1 = dAvgSQ1 + fabsl(lpWaveform[0]->dData[i]);
+            }
+            for(i = 0; i < lpWaveform[1]->dwDataPoints; i=i+1) {
+                dAvgSQ2 = dAvgSQ2 + fabsl(lpWaveform[1]->dData[i]);
+            }
             dAvg1 = dAvg1 / ((double)lpWaveform[0]->dwDataPoints);
             dAvg2 = dAvg2 / ((double)lpWaveform[1]->dwDataPoints);
+            dAvgSQ1 = dAvgSQ1 / ((double)lpWaveform[0]->dwDataPoints);
+            dAvgSQ2 = dAvgSQ2 / ((double)lpWaveform[1]->dwDataPoints);
 
             for(i = 0; i < lpWaveform[0]->dwDataPoints; i=i+1) {
                 dSigma1 = dSigma1 + (dAvg1 - lpWaveform[0]->dData[i])*(dAvg1 - lpWaveform[0]->dData[i]);
@@ -132,11 +146,21 @@ int main(int argc, char* argv[]) {
             for(i = 0; i < lpWaveform[1]->dwDataPoints; i=i+1) {
                 dSigma2 = dSigma2 + (dAvg2 - lpWaveform[1]->dData[i])*(dAvg2 - lpWaveform[1]->dData[i]);
             }
-            dSigma1 = dSigma1 / ((double)lpWaveform[0]->dwDataPoints);
-            dSigma2 = dSigma2 / ((double)lpWaveform[1]->dwDataPoints);
+            for(i = 0; i < lpWaveform[0]->dwDataPoints; i=i+1) {
+                dSigmaSQ1 = dSigmaSQ1 + (dAvgSQ1 - lpWaveform[0]->dData[i])*(dAvgSQ1 - lpWaveform[0]->dData[i]);
+            }
+            for(i = 0; i < lpWaveform[1]->dwDataPoints; i=i+1) {
+                dSigmaSQ2 = dSigmaSQ2 + (dAvgSQ2 - lpWaveform[1]->dData[i])*(dAvgSQ2 - lpWaveform[1]->dData[i]);
+            }
 
-            fprintf(fHandle, "%lu %lf %lf %lf %lf\n", dwSweepFrequency, dAvg1, dAvg2, dSigma1, dSigma2);
+            dSigma1 = sqrt(dSigma1 / ((double)lpWaveform[0]->dwDataPoints));
+            dSigma2 = sqrt(dSigma2 / ((double)lpWaveform[1]->dwDataPoints));
+            dSigmaSQ1 = sqrt(dSigmaSQ1 / ((double)lpWaveform[0]->dwDataPoints));
+            dSigmaSQ2 = sqrt(dSigmaSQ2 / ((double)lpWaveform[1]->dwDataPoints));
+
+            fprintf(fHandle, "%lu %lf %lf %lf %lf %lf %lf %lf %lf\n", dwSweepFrequency, dAvg1, dAvg2, dSigma1, dSigma2, dAvgSQ1, dAvgSQ2, dSigmaSQ1, dSigmaSQ2);
             printf("Sampled at %lu HZ, measured %lf (stddev %lf) and %lf (dev %lf)\n", dwSweepFrequency, dAvg1, dSigma1, dAvg2, dSigma2); fflush(stdout);
+            printf("\tabsolute: measured %lf (stddev %lf) and %lf (dev %lf)\n", dAvgSQ1, dSigmaSQ1, dAvgSQ2, dSigmaSQ2); fflush(stdout);
         }
 
         free(lpWaveform[0]);
