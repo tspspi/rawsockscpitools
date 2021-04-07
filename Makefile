@@ -15,6 +15,7 @@ LIBS=bin/librawsockscpitools$(SLIBSUFFIX) \
 TOOLS=bin/rigol5000_idn$(EXESUFFIX) \
 	bin/rigol5000_querywaveform$(EXESUFFIX) \
 	bin/rigolmso5000_timeseriesavg$(EXESUFFIX) \
+	bin/rigolmso5000_singlevoltagemeasurement$(EXESUFFIX) \
 	bin/siglentssg3021x_idn$(EXESUFFIX) \
 	bin/siglentssg3021x_rfonoff$(EXESUFFIX) \
 	bin/siglentssg3021x_setfrq$(EXESUFFIX) \
@@ -113,6 +114,10 @@ bin/siglentssa3021x_querytrace$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX)
 bin/rigolmso5000_timeseriesavg$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/rigolmso5000_timeseriesavg/rigol5000_timeseriesavg.c
 
 	$(CCBIN) -o bin/rigolmso5000_timeseriesavg$(EXESUFFIX) src/rigolmso5000_timeseriesavg/rigol5000_timeseriesavg.c $(CCBINSUFFIX)
+
+bin/rigolmso5000_singlevoltagemeasurement$(EXESUFFIX): bin/librawsockscpitools$(SLIBSUFFIX) $(GENINCLUDES) src/rigolmso5000_singlevoltagemeasurement/rigol5000_singlevoltagemeasurement.c
+
+	$(CCBIN) -o bin/rigolmso5000_singlevoltagemeasurement$(EXESUFFIX) src/rigolmso5000_singlevoltagemeasurement/rigol5000_singlevoltagemeasurement.c $(CCBINSUFFIX)
 
 # Some experimental tasks
 
