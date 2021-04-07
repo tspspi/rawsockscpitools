@@ -29,6 +29,12 @@ typedef enum labError (*lpfnRigolMSO5000_QueryWaveform)(
     unsigned long int dwChannel,
     struct oscilloscopeWaveformData** lpWaveformOut
 );
+typedef enum labError (*lpfnRigolMSO5000_TriggerForce)(
+    struct rigolMso5000* lpDevice
+);
+typedef enum labError (*lpfnRigolMSO5000_TriggerSingle)(
+    struct rigolMso5000* lpDevice
+);
 
 
 struct rigolMso5000_Vtbl {
@@ -37,6 +43,9 @@ struct rigolMso5000_Vtbl {
 
     lpfnRigolMSO5000_SetChannelEnable       setChannelEnable;
     lpfnRigolMSO5000_QueryWaveform          queryWaveform;
+
+    lpfnRigolMSO5000_TriggerForce           triggerForce;
+    lpfnRigolMSO5000_TriggerSingle           triggerSingle;
 };
 struct rigolMso5000 {
     struct rigolMso5000_Vtbl                *vtbl;

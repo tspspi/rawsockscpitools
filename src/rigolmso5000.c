@@ -68,6 +68,7 @@ static enum labError (mso5000DeviceImpl__IDN)(
     return e;
 }
 
+
 static enum labError (mso5000DeviceImpl__SetChannelEnable)(
     struct rigolMso5000* lpDevice,
 
@@ -183,11 +184,48 @@ static enum labError (mso5000DeviceImpl__QueryWaveform)(
     return labE_Ok;
 }
 
+static char* mso5000_SCPI__TFORce = ":TFOR\n";
+
+static enum labError (mso5000DeviceImpl__TriggerForce)(
+    struct rigolMso5000* lpDevice
+) {
+    enum labError e;
+    struct mso5000DeviceImpl* lpThis;
+
+    if(lpDevice == NULL) { return labE_InvalidParam; }
+
+    lpThis = (struct mso5000DeviceImpl*)(lpDevice->lpReserved);
+
+    if((e = labScpiCommand_NoReply(lpThis->hSocket, mso5000_SCPI__TFORce, strlen(mso5000_SCPI__TFORce))) != labE_Ok) { return e; }
+
+    return e;
+}
+
+static char* mso5000_SCPI__TSINGLE = ":SING\n";
+
+static enum labError (mso5000DeviceImpl__TriggerSingle)(
+    struct rigolMso5000* lpDevice
+) {
+    enum labError e;
+    struct mso5000DeviceImpl* lpThis;
+
+    if(lpDevice == NULL) { return labE_InvalidParam; }
+
+    lpThis = (struct mso5000DeviceImpl*)(lpDevice->lpReserved);
+
+    if((e = labScpiCommand_NoReply(lpThis->hSocket, mso5000_SCPI__TSINGLE, strlen(mso5000_SCPI__TSINGLE))) != labE_Ok) { return e; }
+
+    return e;
+}
+
 static struct rigolMso5000_Vtbl rigolMso5000_DefaultVTBL = {
     &mso5000DeviceImpl__Disconnect,
     &mso5000DeviceImpl__IDN,
     &mso5000DeviceImpl__SetChannelEnable,
-    &mso5000DeviceImpl__QueryWaveform
+    &mso5000DeviceImpl__QueryWaveform,
+
+    &mso5000DeviceImpl__TriggerForce,
+    &mso5000DeviceImpl__TriggerSingle
 };
 
 static char* rigolMso5000__Signature_MSO5072 = "RIGOL TECHNOLOGIES,MSO5072,";
