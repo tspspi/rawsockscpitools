@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "../../include/labtypes.h"
 #include "../../include/rigolmso5000.h"
@@ -61,8 +62,14 @@ int main(int argc, char* argv[]) {
     }
     avgSum = avgSum / ((double)lpWaveform->dwDataPoints);
 
-    printf("# AVG MIN MAX\n");
-    printf("%lf %lf %lf\n", avgSum, dMin, dMax);
+    double dDev = 0;
+    for(iSample = 0; iSample < lpWaveform->dwDataPoints; iSample = iSample + 1) {
+        dDev = dDev + ((avgSum - lpWaveform->dData[iSample])*(avgSum - lpWaveform->dData[iSample])) / ((double)lpWaveform->dwDataPoints);
+    }
+    dDev = sqrt(dDev);
+
+    printf("# AVG STDDEV MIN MAX\n");
+    printf("%lf %lf %lf %lf\n", avgSum, dDev, dMin, dMax);
 
     lpMSO5000->vtbl->disconnect(lpMSO5000);
 
